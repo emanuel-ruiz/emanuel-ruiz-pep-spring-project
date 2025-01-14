@@ -1,14 +1,19 @@
 package com.example.service;
 import com.example.entity.*;
+import com.example.exception.*;
+
+import javax.naming.AuthenticationException;
+import javax.transaction.Transactional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.repository.AccountRepository;
-
-import javassist.NotFoundException;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class AccountService {
     private AccountRepository accountRepository;
 
@@ -18,9 +23,26 @@ public class AccountService {
     }
 
     public Account registerAccount(Account account) throws RuntimeException{
+        if(account.getUsername().isEmpty() || account.getPassword().length() < 4 ){
+            throw new IllegalArgumentException("Username Cannot be empty and password must be 4 characters or more");
+        }
         if(accountRepository.existsByUsername(account.getUsername())){
-            throw new RuntimeException();
+            throw new ResourceConflictException("Username is already registered");
         }
         return accountRepository.save(account);
     }
+
+    public Account Login(Account account) throws RuntimeException, AuthenticationException{
+        Optional<Account> optional = accountRepository.findByUsername(account.getUsername());
+        Account ac = optional.get();
+        if(!optional.isPresent()){
+            throw new ResourceNotFoundException("Account withe Username "+ account.getUsername() + " Not Found");
+        } 
+
+        if(account.getUsername() != ac.getUsername() || account.getPassword() != ac.getPassword()){
+            throw new AuthenticationException("Username and Password Do not match");
+        }
+
+        return ac;
+    } 
 }
