@@ -59,7 +59,7 @@ public class SocialMediaController {
     /*TODO temp message */
     @PostMapping("/messages")
     public @ResponseBody ResponseEntity<Message> createMessage(@RequestBody Message newMessage){
-        return ResponseEntity.status(200).body(newMessage);
+        return ResponseEntity.status(200).body(messageService.createMessage(newMessage));
     }
 
     /*TODO temp messages */
