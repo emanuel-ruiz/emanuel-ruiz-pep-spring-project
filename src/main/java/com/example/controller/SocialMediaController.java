@@ -46,8 +46,14 @@ public class SocialMediaController {
 
     /*TODO Change the Response Entity */
     @PostMapping("/login")
-    public @ResponseBody ResponseEntity<Account> login(@RequestBody Account newAccount){
-        return ResponseEntity.status(200).body(accountService.login(newAccount));
+    public @ResponseBody ResponseEntity<?> login(@RequestBody Account newAccount){
+
+        try {
+            return ResponseEntity.status(200).body(accountService.login(newAccount));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        } 
+        
     }
 
     /*TODO temp message */
@@ -60,30 +66,30 @@ public class SocialMediaController {
     @GetMapping("/messages")
     public @ResponseBody List<Message> getMessages(){
         List<Message> messages = new ArrayList<>();
-
+        messages = messageService.getAllMessages();
         return messages;
     }
 
-    // @GetMapping("/messages/{messageID}")
-    // public @ResponseBody Message getMessageByID(@PathVariable int messageID){
-    //     return 
-    // }
+    @GetMapping("/messages/{messageID}")
+    public @ResponseBody ResponseEntity<Message> getMessageByID(@PathVariable int messageID){
+        return ResponseEntity.status(200).body(messageService.getMessageById(messageID));
+    }
 
-    // @DeleteMapping("messages/{messageID}")
-    // public @ResponseBody Integer deleteMessage(@PathVariable long messageID){
+    @DeleteMapping("messages/{messageID}")
+    public @ResponseBody ResponseEntity<Integer> deleteMessage(@PathVariable int messageID){
+        return ResponseEntity.status(200).body(messageService.deleteMessageById(messageID));
+    }
 
-    // }
+    @PatchMapping("messages/{messageID}")
+    public @ResponseBody ResponseEntity<Integer> updatMessage(@PathVariable int messageID,@RequestBody String message){
+        return ResponseEntity.status(200).body(messageService.updateMessageById(messageID, message));
+    }
 
-    // @PatchMapping("messages/{messageID}")
-    // public @ResponseBody Message updatMessage(@PathVariable long messageID){
-
-    // }
-
-    // @GetMapping("/accounts/{accountId}/messages")
-    // public @ResponseBody List<Message> getMessagesByAccount(@PathVariable long accountId)
-    // {
-
-    // }
+    @GetMapping("/accounts/{accountId}/messages")
+    public @ResponseBody ResponseEntity<List<Message>> getMessagesByAccount(@PathVariable int accountId)
+    {
+        return ResponseEntity.status(200).body(messageService.getMessagesByUser(accountId));
+    }
 
     @ExceptionHandler(ResourceConflictException.class)
     public ResponseEntity<String> resourceConflictExceptionHandler(ResourceConflictException ex){
@@ -92,12 +98,17 @@ public class SocialMediaController {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> resourceNotFoundExceptionHandler(ResourceNotFoundException ex){
-        return ResponseEntity.status(401).body(ex.getMessage());
+        return ResponseEntity.status(400).body(ex.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<String> authenticationExceptionHandler(AuthenticationException ex){
         return ResponseEntity.status(401).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException ex){
+        return ResponseEntity.status(400).body(ex.getMessage());
     }
 
 }

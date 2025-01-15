@@ -39,15 +39,21 @@ public class MessageService {
         return messages;
     }
 
-    public Message getMessageById(Integer messageId) throws RuntimeException{
+    public Message getMessageById(int messageId) throws RuntimeException{
         Optional<Message> message = messageRepository.findById(messageId);
-        if(!message.isPresent()){
-            throw new ResourceNotFoundException("Message with message_id: " + messageId + " Not Found");
-        }
+        
         return message.get();
     }
 
-    public Message updateMessageById(Integer messageId, String messageText) throws RuntimeException{
+    public Integer deleteMessageById(int messageId){
+        if(messageRepository.existsById(messageId)){
+            messageRepository.deleteById(messageId);
+            return 1;
+        }
+        return null;
+    }
+
+    public Integer updateMessageById(int messageId, String messageText) throws RuntimeException{
         if(messageText.isBlank() || messageText.length() > 255){
             throw new IllegalArgumentException("Message Text cannot be blank or longer than 255 characters");
         }
@@ -57,7 +63,8 @@ public class MessageService {
         }
         Message newMessage = message.get();
         newMessage.setMessageText(messageText);
-        return messageRepository.save(newMessage);
+        messageRepository.save(newMessage);
+        return 1;
     }
 
     public List<Message> getMessagesByUser(int user_id){
