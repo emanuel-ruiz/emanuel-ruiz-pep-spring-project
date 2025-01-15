@@ -23,7 +23,7 @@ public class AccountService {
     }
 
     public Account registerAccount(Account account) throws RuntimeException{
-        if(account.getUsername().isEmpty() || account.getPassword().length() < 4 ){
+        if(account.getUsername().isBlank() || account.getPassword().length() < 4 ){
             throw new IllegalArgumentException("Username Cannot be empty and password must be 4 characters or more");
         }
         if(accountRepository.existsByUsername(account.getUsername())){
@@ -32,13 +32,13 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    public Account Login(Account account) throws RuntimeException, AuthenticationException{
+    public Account login(Account account) throws RuntimeException, AuthenticationException{
         Optional<Account> optional = accountRepository.findByUsername(account.getUsername());
-        Account ac = optional.get();
         if(!optional.isPresent()){
             throw new ResourceNotFoundException("Account withe Username "+ account.getUsername() + " Not Found");
         } 
-
+        Account ac = optional.get();
+        
         if(account.getUsername() != ac.getUsername() || account.getPassword() != ac.getPassword()){
             throw new AuthenticationException("Username and Password Do not match");
         }

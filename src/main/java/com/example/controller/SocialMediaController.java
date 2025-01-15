@@ -1,5 +1,7 @@
 package com.example.controller;
 import com.example.entity.*;
+import com.example.exception.ResourceConflictException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
 
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.AuthenticationException;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller using Spring. The endpoints you will need can be
@@ -42,7 +47,7 @@ public class SocialMediaController {
     /*TODO Change the Response Entity */
     @PostMapping("/login")
     public @ResponseBody ResponseEntity<Account> login(@RequestBody Account newAccount){
-        return ResponseEntity.status(200).body(newAccount);
+        return ResponseEntity.status(200).body(accountService.login(newAccount));
     }
 
     /*TODO temp message */
@@ -59,25 +64,40 @@ public class SocialMediaController {
         return messages;
     }
 
-    @GetMapping("/messages/{messageID}")
-    public @ResponseBody Message getMessageByID(@PathVariable long messageID){
+    // @GetMapping("/messages/{messageID}")
+    // public @ResponseBody Message getMessageByID(@PathVariable int messageID){
+    //     return 
+    // }
 
+    // @DeleteMapping("messages/{messageID}")
+    // public @ResponseBody Integer deleteMessage(@PathVariable long messageID){
+
+    // }
+
+    // @PatchMapping("messages/{messageID}")
+    // public @ResponseBody Message updatMessage(@PathVariable long messageID){
+
+    // }
+
+    // @GetMapping("/accounts/{accountId}/messages")
+    // public @ResponseBody List<Message> getMessagesByAccount(@PathVariable long accountId)
+    // {
+
+    // }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<String> resourceConflictExceptionHandler(ResourceConflictException ex){
+        return ResponseEntity.status(409).body(ex.getMessage());
     }
 
-    @DeleteMapping("messages/{messageID}")
-    public @ResponseBody Integer deleteMessage(@PathVariable long messageID){
-
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> resourceNotFoundExceptionHandler(ResourceNotFoundException ex){
+        return ResponseEntity.status(401).body(ex.getMessage());
     }
 
-    @PatchMapping("messages/{messageID}")
-    public @ResponseBody Message updatMessage(@PathVariable long messageID){
-
-    }
-
-    @GetMapping("/accounts/{accountId}/messages")
-    public @ResponseBody List<Message> getMessagesByAccount(@PathVariable long accountId)
-    {
-
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> authenticationExceptionHandler(AuthenticationException ex){
+        return ResponseEntity.status(401).body(ex.getMessage());
     }
 
 }
