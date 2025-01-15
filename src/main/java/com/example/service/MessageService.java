@@ -41,7 +41,9 @@ public class MessageService {
 
     public Message getMessageById(int messageId) throws RuntimeException{
         Optional<Message> message = messageRepository.findById(messageId);
-        
+        if(!message.isPresent()){
+            return null;
+        }
         return message.get();
     }
 
