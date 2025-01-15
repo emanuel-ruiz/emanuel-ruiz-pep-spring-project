@@ -1,3 +1,6 @@
+/**
+ * Code Written by: Emanuel Ruiz
+ */
 package com.example.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
