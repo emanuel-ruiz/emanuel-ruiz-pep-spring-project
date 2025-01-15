@@ -35,11 +35,11 @@ public class AccountService {
     public Account login(Account account) throws RuntimeException, AuthenticationException{
         Optional<Account> optional = accountRepository.findByUsername(account.getUsername());
         if(!optional.isPresent()){
-            throw new ResourceNotFoundException("Account withe Username "+ account.getUsername() + " Not Found");
+            throw new AccountNotFoundException("Account withe Username "+ account.getUsername() + " Not Found");
         } 
         Account ac = optional.get();
         
-        if(account.getUsername() != ac.getUsername() || account.getPassword() != ac.getPassword()){
+        if(!account.getPassword().equals(ac.getPassword())){
             throw new AuthenticationException("Username and Password Do not match");
         }
 

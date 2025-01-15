@@ -1,5 +1,6 @@
 package com.example.controller;
 import com.example.entity.*;
+import com.example.exception.AccountNotFoundException;
 import com.example.exception.ResourceConflictException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.service.AccountService;
@@ -109,6 +110,11 @@ public class SocialMediaController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException ex){
         return ResponseEntity.status(400).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<String> accountNotFoundExceptionHandler(AccountNotFoundException ex){
+        return ResponseEntity.status(401).body(ex.getMessage());
     }
 
 }
